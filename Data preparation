@@ -1,0 +1,47 @@
+  # Read in the microarrays
+
+library(affy)
+library (vsn)
+
+projectPath <- dirname(rstudioapi::getSourceEditorContext()$path)
+  
+  ##read in the microarrys sorted by exposed to radiation, not exposed, healthy and all together
+setwd(paste(projectPath, 'rawdata/radiation_exposed', sep = '/'))
+exp=ReadAffy()
+
+setwd(paste(projectPath, 'rawdata/radiation_non_exposed', sep = '/'))
+nonexp=ReadAffy()
+
+setwd(paste(projectPath, 'rawdata/healthy', sep = '/'))
+healthy=ReadAffy()
+
+setwd(paste(projectPath, 'rawdata/all', sep = '/'))
+allchips=ReadAffy()
+
+  ##normalisation
+exp.norm=vsnrma(exp)
+nonexp.norm=vsnrma(nonexp)
+healthy.norm= vsnrma(healthy)
+allchips.norm=vsnrma(allchips)
+
+exp.matrix=exprs(exp.norm)
+nonexp.matrix= exprs(nonexp.norm)
+healthy.matrix= exprs(healthy.norm)
+allchips.matrix= exprs(allchips.norm)
+
+  ##rename rownames as gene symbols 
+a=read.csv("projectPath\\ensembl.103.txt.txt", sep= ",") ####YOU NEED YOUR OWN PATH
+
+affy.ensembl=as.character(a[,5]) #affy names for genes
+symbol.ensembl=as.character(a[,4]) #trivial names genes
+names(symbol.ensembl)= affy.ensembl # connection affy and trivial names
+
+affyIDs= rownames(exp.matrix) # exp.matrix and nonexp.matrix have same rownames (as well as healthy.matrix and all.matrix)
+symbol= symbol.ensembl[affyIDs] # here is only name important, not if exp or nonexp
+
+rownames(exp.matrix)     = as.character(symbol)
+rownames(nonexp.matrix)  = as.character(symbol) 
+rownames(healthy.matrix) = as.character(symbol)
+rownames(allchips.matrix)= as.character(symbol)
+
+  # now you have 4 matrices with the expresiion data and the gene names as row names
