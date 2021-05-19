@@ -77,12 +77,12 @@ dev.off()
 pdf(file = 'rnadeg_human_thyroid_cancer_rawdata.pdf')
 rnadeg.raw = AffyRNAdeg(data.thyroid)
 plotAffyRNAdeg(rnadeg.raw, col=rainbow(14))
-title(sub=" thyroid cancer rawdata")
+title(sub="human thyroid cancer rawdata (GSE35570) (Handkiewicz-Junak et all., 2016)")
 dev.off()
 
 pdf(file = 'rnadeg_human_thyroid_cancer_rawdata_shifted.pdf')
 plotAffyRNAdeg(rnadeg.raw, col=rainbow(14), transform="shift.only")
-title(sub="human thyroid cancer rawdata")
+title(sub="human thyroid cancer rawdata (GSE35570) (Handkiewicz-Junak et all., 2016)")
 dev.off()
 
 #scatterplots
@@ -93,7 +93,7 @@ for (i in 1:13) {
   for (j in (i+1):14) {
     pdf(file = paste('scatterplot_thyroid_vsnrma_normalised', i, "_", j,'.pdf'))
     plot(exprs(thyroid.vsnrma)[,c(i,j)], pch=".", 
-         main=paste("plot of probe", chipnames[i], "\nand", chipnames[j]))
+         main=paste("plot of probe", chipnames[i], "\nand", chipnames[j], "\n(Handkiewicz-Junak et all., 2016)"))
     abline(0,1,col="red")
     dev.off()
   }
