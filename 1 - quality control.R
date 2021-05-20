@@ -16,7 +16,7 @@ save.image(file = "rawdata.thyroid.rda")
 #quality control
 
 #single chip control 
-setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/rda")
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots")
 pdf(file="single_chip_control.pdf")
 image(data.thyroid, col = rainbow(14, start = 0, end = 0.75)[10:1])
 dev.off()
@@ -28,6 +28,7 @@ setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/rda")
 save.image(file = "normalized_data.rda")
 
 #meanSdPlot
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots")
 install.packages("hexbin")
 library(hexbin)
 pdf(file = 'meanSdPlot_thyroid_vsnrma_normalized.pdf')
@@ -59,13 +60,13 @@ dev.off()
 
 #density function 
 #raw data
-setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/rda")
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots")
 pdf(file = 'hist_thyroid_rawdata.pdf')
 hist(data.thyroid, col=rainbow(14), main="Density function of log Intensity of papillary thyroid cancer (GSE35570) \nbefore normalization (Handkiewicz-Junak et all., 2016)")
 dev.off()
 
 #normalized data
-setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/rda")
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots")
 pdf(file = 'hist_thyroid_vsnrma_normalised.pdf')
 plot(density(exprs(thyroid.vsnrma)[,1]), type="n", xlab="log Intensity", ylim = c(0,1), main="Density function of log Intensity of papillary thyroid cancer (GSE35570) \nafter vsnrma normalization (Handkiewicz-Junak et all., 2016)")
 for (i in 1:ncol(exprs(thyroid.vsnrma))) {
@@ -86,7 +87,7 @@ title(sub="human thyroid cancer rawdata (GSE35570) (Handkiewicz-Junak et all., 2
 dev.off()
 
 #scatterplots
-setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/rda")
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots")
 chipnames.CEL=colnames(exprs(thyroid.vsnrma))
 chipnames = substr(chipnames.CEL, 1, nchar(chipnames.CEL)-4) #creating a vector of the chipnames without the .CEL
 for (i in 1:13) {
