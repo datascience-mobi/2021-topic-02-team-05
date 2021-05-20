@@ -52,6 +52,8 @@ dim(thyroid.expr.matrix.sub)
 
 #deleting the first 46 rows (AFFX...)
 thyroid.expr.matrix.sub <- thyroid.expr.matrix.sub[-c(1:46),]
+#reorder the matrix
+thyroid.expr.matrix.sub <- thyroid.expr.matrix.sub[,c(1,5,6,7,8,2,3,4,9,10,11,12,13,14)]
 
 #boxplot
 par(las=2)
