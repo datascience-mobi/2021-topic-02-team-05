@@ -27,4 +27,8 @@ length(symbol)
 rownames(thyroid.expr.matrix)=as.character(symbol)
 head(thyroid.expr.matrix)
 
+#save matrix as csv
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/tables")
+write.csv(thyroid.expr.matrix, "thyroid_gene_expression")
+
 ##This is the matrix you can calculate with##
