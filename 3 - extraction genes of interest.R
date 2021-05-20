@@ -55,6 +55,10 @@ thyroid.expr.matrix.sub <- thyroid.expr.matrix.sub[-c(1:46),]
 #reorder the matrix
 thyroid.expr.matrix.sub <- thyroid.expr.matrix.sub[,c(1,5,6,7,8,2,3,4,9,10,11,12,13,14)]
 
+#save matrix as csv
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/tables")
+write.csv(thyroid.expr.matrix.sub, "thyroid_gene_expression_TRA")
+
 #boxplot
 par(las=2)
 boxplot(t(thyroid.expr.matrix.sub),col=rainbow(length(rownames(thyroid.expr.matrix.sub))),main="gene expression of thyroid-specific genes in thyroid cancer",cex.axis=0.8)
