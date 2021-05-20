@@ -63,7 +63,7 @@ write.csv(thyroid.expr.matrix.sub, "thyroid_gene_expression_TRA")
 par(las=2)
 boxplot(t(thyroid.expr.matrix.sub),col=rainbow(length(rownames(thyroid.expr.matrix.sub))),main="gene expression of thyroid-specific genes in thyroid cancer",cex.axis=0.8)
 #sort alphabetically
-setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/rda")
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots")
 pdf(file="boxplot_thyroid_cancer_genes_of_interest.pdf")
 
 order.vector=sort(colnames(t(thyroid.expr.matrix.sub)),index.return=T)$ix
