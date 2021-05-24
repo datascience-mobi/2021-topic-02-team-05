@@ -1,1 +1,261 @@
+---
+title: "Thyroid specific antigens"
+subtitle: and how they affect thyroid cancer
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Gliederung Markdown:
+1. Introduction (biology, our data set and question we want to answer, and what we actually did to find the answers)
+2. Main part (steps, plots, some codes and the results of the e.g t-Test)
+3. Results (conclusion of pour results, biological meaning)
+4. Conclusion (is it new? next steps? did we found something?)
+5. Literature
+6. Appendix (e.g. lists with all genes, that are differentially expressed)
+
+
+## 1. Introduction
+
+Tissue restricted antigens (TRA) are those which are expressed in at most five out of fourty-five tissues, and additionally in the lymph system, e.g. in the medullary thymic epithelial cells (mTECs), where the negative selection of the T-cells takes place. A defective regulation of TRA expression in mTECs can lead to autoimmune diseases, caused by the presence of T-cells reacting to a self-antigen. In most patients of e.g. the Hashimoto's or Grave's disease, the most common autoimmune disorders concerning the thyroid, are antibodies against the thyroglobulin or the thyroid peroxidase present. 
+
+Due to this negative selection, the immune system cannot react properly to tumor cells which express tumor associated antigens (TAA), like differentiation or onco-fetal antigens (Klein,2006). The tumor escapes the immune system and can grow.
+
+
+But also radiation has an positive impact on tumor development, especially on thyroid cancer: the thyroid is higly sensitive to long-term effects on radiation exposure. Though females tend to develope more often thyroid cancer than males, youth is a greater risk factor for thyroid cancer. Papillary carcinomas (PTC) represent with 80 % the most common thyroid tumor type(Albi, 2017, ganzer Absatz). Usually, there is one gene from the MAPK signal cascade mutated, the most frequently affected genes are *braf* (point mutation, mostly V600E) and *ret* (RET/PTC rearrangement).
+
+
+
+##we oder ganz neutral? (neutral= it was worked??? )
+We were working with 14 samples of thyroid tissues, in which five of them were extracted from patients, which were exposed to radiation and developped PTC, another four of sporadic PTC tissue and five samples from healthy patients. The gene sequencing was performed using total RNA and the gene chip **hgu133plus2hsenstcdf** (name? or is it the HSENS...).
+
+After performing a (single chip) quality control we decided to use all fourteen chips for our analysis: after normalising the signal intensity of the chips, the gene expression was **equally? **distributed, the RNA degradation plot did not show any quality deficiencies, and as we scattered all chips against each other they showed the same pattern.
+
+##  **BEISPIEL PLOT QUALITY CONTROL**
+
+
+```{r all code (for discription), include=FALSE}
+# I need the whole code I guess, so here it is (Lines Code from Github):
+
+library(affy)
+library(vsn)
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_rawdata")
+data.thyroid = ReadAffy()
+thyroid.vsnrma<-vsnrma(data.thyroid)
+thyroid.expr.matrix=exprs(thyroid.vsnrma)
+head(thyroid.expr.matrix)
+ensemble.id = rownames(thyroid.expr.matrix)
+expr=substr(ensemble.id,0,15)
+rownames(thyroid.expr.matrix)=expr
+
+
+#read in annotation file 
+setwd("/Users/Line/Documents/tra_project/thyroid_annotation_file")
+a=read.csv("ensembl_103.txt",sep="\t")
+head(a)
+transcript.id.ensemble=as.character(a[,2])
+symbol.ensembl=as.character(a[,4])
+names(symbol.ensembl)=transcript.id.ensemble
+head(symbol.ensembl)
+
+#look into data matrix
+head(thyroid.expr.matrix)
+ensemble.id = rownames(thyroid.expr.matrix)
+symbol=symbol.ensembl[ensemble.id]
+head(symbol)
+dim(thyroid.expr.matrix)
+length(symbol)
+
+#re-apply rownames to gene symbols in the data.matrix
+rownames(thyroid.expr.matrix)=as.character(symbol)
+
+setwd("/Users/Line/Documents/tra_project/tra_tables")
+b=read.csv(file="Human_protein_atlas_TRA_5median_genes_annotated.tsv",sep=",")
+tiss=b[,11]
+ind=which(tiss=="thyroid")
+TRA.symbol=b[,6]
+thyroid.TRA1=TRA.symbol[ind]
+
+c=read.csv(file="tra.2014.human.5x.table.tsv",sep="\t")
+tiss=c[,11]
+ind=which(tiss=="Thyroid")
+TRA.symbol=c[,3]
+thyroid.TRA2=TRA.symbol[ind]
+
+d=read.csv(file="tra.2014.human.roth.5x.table.tsv",sep="\t")
+tiss=d[,11]
+ind=which(tiss=="thyroid_gland")
+TRA.symbol=d[,3]
+thyroid.TRA3=TRA.symbol[ind]
+
+e=read.csv(file="tra.2014.mouse.5x.table.tsv",sep="\t")
+tiss=e[,11]
+ind=which(tiss=="thyroid")
+TRA.symbol=e[,3]
+thyroid.TRA4=TRA.symbol[ind]
+
+f=read.csv(file="tra.2014.mouse.4301.5x.table.tsv",sep="\t")
+tiss=f[,11]
+ind=which(tiss=="thyroid")
+TRA.symbol=f[,3]
+thyroid.TRA5=TRA.symbol[ind]
+
+g=read.csv(file="tra.2017.human.gtex.5x.table.tsv",sep="\t")
+tiss=g[,10]
+ind=which(tiss=="Thyroid")
+TRA.symbol=g[,3]
+thyroid.TRA6=TRA.symbol[ind]
+
+thyroid.TRA = union(thyroid.TRA1, thyroid.TRA2)
+thyroid.TRA = union(thyroid.TRA, thyroid.TRA3)
+thyroid.TRA = union(thyroid.TRA, thyroid.TRA4)
+thyroid.TRA = union(thyroid.TRA, thyroid.TRA6)
+
+#sometimes upper case and lower case and other problems disturb the search (for example levels) 
+#which you can eliminate with as.character and toupper
+
+row.ind=which(toupper(thyroid.TRA) %in% as.character(symbol))
+thyroid.expr.matrix.sub=thyroid.expr.matrix[row.ind,]
+
+head(thyroid.expr.matrix.sub)
+dim(thyroid.expr.matrix.sub)
+
+#deleting the first 46 rows (AFFX...)
+thyroid.expr.matrix.sub <- thyroid.expr.matrix.sub[-c(1:46),]
+#reorder the matrix
+thyroid.expr.matrix.sub <- thyroid.expr.matrix.sub[,c(1,5,6,7,8,2,3,4,9,10,11,12,13,14)]
+
+#save matrix as csv
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/tables")
+write.csv(thyroid.expr.matrix.sub, "thyroid_gene_expression_TRA")
+
+#boxplot
+par(las=2)
+boxplot(t(thyroid.expr.matrix.sub),col=rainbow(length(rownames(thyroid.expr.matrix.sub))),main="gene expression of thyroid-specific genes in thyroid cancer",cex.axis=0.8)
+#sort alphabetically
+setwd("/Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots")
+pdf(file="boxplot_thyroid_cancer_genes_of_interest.pdf")
+
+#create three matrices (radiation_exposed/not_exposed/healthy)
+radexp.matrix=thyroid.expr.matrix.sub[,c(1,5,6,7,8)]
+radnonexp.matrix=thyroid.expr.matrix.sub[,c(2,3,4,9)]
+healthy.matrix=thyroid.expr.matrix.sub[,c(10,11,12,13,14)]
+  ##and now mine
+tiss1=unique(as.character(b[,11])) 
+th.genes1= b [b$Max_tissue %in% tiss1[31],]
+dim(th.genes1)
+
+tiss2= unique(as.character(c[,11])) 
+length(tiss2)
+th.genes2= c[c$max.tissue %in% tiss2[35],  ]
+dim(th.genes2)
+
+tiss3=unique(as.character(d[,11]))
+th.genes3= d[d$max.tissue %in% tiss3[20],]
+dim(th.genes3)
+
+tiss4=unique(as.character(e[,11]))
+th.genes4= e[e$max.tissue %in% tiss4[44],]
+dim(th.genes4)
+
+tiss5=unique(as.character(f[,11]))
+
+tiss6=unique(as.character(g[,10]))
+th.genes6= g[g$max.tissue %in% tiss6[44],] 
+dim(th.genes6)
+
+th.genes6[,11]= as.factor("no information")
+
+genes1= data.frame(th.genes1[,6],th.genes1[,2])
+genes2= data.frame(th.genes2[,3],th.genes2[,7])
+genes3= data.frame(th.genes3[,3],th.genes3[,7])
+genes4= data.frame(th.genes4[,3],th.genes4[,7])
+genes6= data.frame(th.genes6[,3],th.genes6[,11])
+
+colnames(genes1)= c("gene.symbol", "chromosome")
+colnames(genes2)= c("gene.symbol", "chromosome")
+colnames(genes3)= c("gene.symbol", "chromosome")
+colnames(genes4)= c("gene.symbol", "chromosome")
+colnames(genes6)= c("gene.symbol", "chromosome")
+
+allplotinfos= bind_rows(genes1,genes2,genes3, genes4,genes6)
+y= duplicated(allplotinfos$gene.symbol)
+Index= which(y==FALSE )
+uniqueinfos=allplotinfos[Index,]
+
+indexx=which(uniqueinfos$gene.symbol %in% symbol)
+finalinfos= uniqueinfos[indexx,]
+View(finalinfos) # also ich habe 419 bzw. 418 Gene
+
+#final piechart
+chrnumbers= table(finalinfos[,2])
+chrnumbersall= chrnumbers[c(2:23,26,151)]
+chromosomes= chrnumbersall[c(1,12,16:22,2:11,13:15,23)]
+chromswith0= c(chromosomes, chrnumbersall[24])
+chromswithY= c(chromosomes, chrnumbers[27])
+```
+
+In the next steps we focused on thyroid specific antigens and genes (TSG), which we determined by using five lists (from human and mouse samples) of genes and the tissues they express them the most.360 out of these genes were examined on the microarrays **(LIST SEE APENDIX????)**. We created a matrix including the expression data of all our genes of interest in the diffent samples (see below), so we can analyse them. We wanted to find out which of these thyroid specific genes are differentially expressed in thyroid papillarys carcinomas (induced or not induced by radiation) and whether there is a relation between some of them or not. We wanted to cluster them and try to predict the expression of a specific gene based on the expression data of another one.
+
+```{r head(thyroid.expr.matrix.sub), echo=TRUE}
+head(thyroid.expr.matrix.sub)
+#the first 6 TSG and their expression levels in cancer tissue exposed to radiation, not exposed and healthy tissue
+```
+
+*Hier sollte wahrscheinlich noch eine Überleitung hin*
+
+  ## 2. Main part
+  
+  We started our project by taking a closer look at the data. We found out, that the TSG are spread over all chromosomes, except for the Y chromosome. Unfortunately we cannot say on which chromosomes can be found the most TSG, because of the missing information for 207 out of 418 genes. 
+
+
+```{r chromosome plot, echo=FALSE}
+library(viridisLite)
+barplot(chromswithY, col=plasma(23), main=" Distribution of thyroid specific genes over chromosomes", xlab= "chromosomes", ylab= "number of genes", ylim=c(0,20))
+```
+
+A heatmap revealed that the relative expression was from 5 to 11, 11 beeing highly expressed. Most of the genes showed an expression between 5 to 7.
+
+```{r heat map, echo=FALSE}
+littlematrix= thyroid.expr.matrix.sub[1:20,]
+library(pheatmap)
+heat=pheatmap(littlematrix, 
+                             main = "gene expression of thyroid TRA's \nin PTC and healthy thyroid tissue (GSE35570) \n(Handkiewicz-Junak et all., 2016)",
+                             cluster_rows = F, 
+                             cluster_cols = F, 
+                             cellheight = 3, 
+                             cellwidth = 3,
+                             legend =TRUE,
+                             fontsize = 3,
+                             filename = "pheatmap_thyroid_TRA_expression.pdf",
+                             gaps_col = c(5,9)
+               )
+heat
+```
+
+
+
+
+  ## 5. Literature (not complete yet)
+
+TRA datas:
+GTEX 2015, Human genomics. The Genotype-Tissue Expression (GTEx) pilot analysis: multitissue gene regulation in humans. GTEx Consortium. Science. 2015 May 8;348(6235):648-60. https://pubmed.ncbi.nlm.nih.gov/25954001/
+
+Lattin et al. 2008, Expression analysis of G Protein-Coupled Receptors in mouse macrophages. Immunome Res. 2008 Apr 29;4:5. https://pubmed.ncbi.nlm.nih.gov/18442421/
+
+Roth et al. 2006, Gene expression analyses reveal molecular relationships among 20 regions of the human CNS. Neurogenetics. 2006 May;7(2):67-80. https://pubmed.ncbi.nlm.nih.gov/16572319/
+
+Su et al. 2002, Large-scale analysis of the human and mouse transcriptomes. Proc Natl Acad Sci U S A. 2002 Apr 2;99(7):4465-70. https://pubmed.ncbi.nlm.nih.gov/11904358/
+
+Su et al. 2004, A gene atlas of the mouse and human protein-encoding transcriptomes. Proc Natl Acad Sci U S A. 2004 Apr 20;101(16):6062-7. https://pubmed.ncbi.nlm.nih.gov/15075390/
+
+Uhlén et al. 2015, Proteomics. Tissue-based map of the human proteome. Science. 2015 Jan 23;347(6220):1260419. https://pubmed.ncbi.nlm.nih.gov/25613900/
+
+
+in generell:
+Albi et al. 2017. Radiation and Thyroid Cancer. Int J Mol Sci. 2017 Apr 26;18(5):911. https://pubmed.ncbi.nlm.nih.gov/28445397/
 
