@@ -215,7 +215,7 @@ head(thyroid.expr.matrix.sub)
 
 ```{r chromosome plot, echo=FALSE}
 library(viridisLite)
-barplot(chromswithY, col=plasma(23), main=" Distribution of thyroid specific genes over chromosomes", xlab= "chromosomes", ylab= "number of genes", ylim=c(0,20))
+barplot(chromswithY, col=plasma(23), main=" Distribution of thyroid specific genes over chromosomes \n Dinkelacker, 2019, PhD thesis, University of Heidelberg", xlab= "chromosomes", ylab= "number of genes", ylim=c(0,20))
 ```
 
 A heatmap revealed that the relative expression was from 5 to 11, 11 beeing highly expressed. Most of the genes showed an expression between 5 to 7.
