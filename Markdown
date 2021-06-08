@@ -236,6 +236,116 @@ heat=pheatmap(littlematrix,
                )
 heat
 ```
+We did a principal component analysis (PCA) and coloured the different spots according to the tissue sample the microarray was prepared with. The five healthy samples and the five radiation exposed samples formed both a clear individual cluster. Ttwo of the samples of the sick patients, who were not exposed to radiation, formed a cluster, while the other two seemed to be more similiar to the radiation exposed samples 
+[Bild 1]: /Users/Line/Documents/tra_project/thyroid_cancer_sessions/plots/pca_chips. 
+![Alt-Text][Bild 1]
+To find out, wether those were just outliers, we repeated the principal component analysis with 30 chips, 10 chips in each group. This time it was clar, that the healthy samples formed a cluster and the sick samples another one. 
+```{r}
+#PCA with 30 chips
+pca.t <- prcomp(t(thyroid.expr.matrix.sub), center = TRUE, scale = TRUE)
+summary(pca.t) #with PC1 and PC2 40,87% of the variance are explained
+col.pca.t = ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radexp.matrix), 
+                   "red", 
+                   ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radnonexp.matrix), 
+                          "blue", 
+                          "green"))
+pdf(file="pca_genes")
+plot(pca.t$x[,1], pca.t$x[,2], 
+     col= col.pca.t,
+     pch=16,
+     xlab='PC1',ylab='PC2',
+     main = "PC1 vs. PC2 for radiation-exposed PTC (red), \nnot-exposed PTC (blue) and healthy thyroid tissue (green) \n(Handkiewicz-Junak et all., 2016)") 
+dev.off()
+
+# Percentage of variance explained by dimensions
+install.packages('factoextra')
+library("factoextra")
+eigenvalue <- round(get_eigenvalue(pca.t), 1)
+variance.percent <- eigenvalue$variance.percent
+head(eigenvalue)
+
+
+#legende einfügen
+#Varianz an die Achsen schreiben
+
+#k-means 
+pca.matrix<-pca.t[["rotation"]]
+pca.matrix #nicht nötig
+
+km3 = kmeans(t(thyroid.expr.matrix.sub),centers=3,nstart = 100)
+km3$cluster
+cluster1.1 = c(which(km3$cluster==1))
+cluster2.1 = c(which(km3$cluster==2))
+cluster3.1 = c(which(km3$cluster==3))
+
+library("factoextra")
+
+setwd("/Users/Line/Documents/tra_project/with_30_chips/plots")
+pdf(file="pca_genes_kmeans_3")
+fviz_cluster(km3, data = t(thyroid.expr.matrix.sub),
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+)
+dev.off()
+
+km2 = kmeans(t(thyroid.expr.matrix.sub),centers=2,nstart = 100)
+km2$cluster
+cluster1.2 = c(which(km2$cluster==1))
+cluster2.2 = c(which(km2$cluster==2))
+cluster3.2 = c(which(km2$cluster==3))
+
+pdf(file="pca_genes_kmeans_2")
+fviz_cluster(km2, data = t(thyroid.expr.matrix.sub),
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+)
+dev.off()
+
+```
+To investigate, which of the 360 TRA's showed a significant change in gene expression upon the three different groups, we performed an ANOVA test for each gene and stored the 106 significantly different expressed ones in a new matrix. A posthoc test of each of the significanty different expressed genes showed us how the acccording gene was expressed in the three groups and between which of the groups there was the significant difference.
+```{r}
+### creating a new matrix for ANOVA test
+
+groups= c("radexp","radexp","radexp","radexp","radexp","radnonexp","radnonexp","radnonexp","radnonexp","healthy","healthy","healthy","healthy","healthy")
+anovamatrix=t(thyroid.expr.matrix.sub)
+anovamatrix= cbind(groups,anovamatrix)
+
+# anovamatrix[,1] = groups(exp, nonexp, healthy)
+# anovamatrix[,i] = genes with their expression data
+
+
+# ANOVA Test for each gene
+sig.genes.vector=c()
+
+for (i in 2:dim(anovamatrix)[2]){
+  if (summary.aov(aov(anovamatrix[,i]~ anovamatrix[,1]))[[1]][[1,5]] < 0.05){
+    sig.genes.vector = rbind(sig.genes.vector, colnames(anovamatrix)[i])
+  }
+  
+}
+
+sig.genes.matrix= thyroid.expr.matrix.sub[sig.genes.vector,]
+# matrix with expression data of our significant diffent expressed genes (106 genes)
+
+
+
+#for-loop posthoc for every gene
+install.packages("multcompView")
+library(multcompView)
+
+for (i in 2:dim(anovamatrix)[2]){
+    pdf(file = paste('posthoc_gene', colnames(anovamatrix)[i], "_", colnames(anovamatrix)[j],'.pdf'))
+    posthoc=TukeyHSD(aov(anovamatrix[,i] ~ anovamatrix[,1]))
+    boxplot()
+    dev.off()
+}
+```
+
+
 
 
 
