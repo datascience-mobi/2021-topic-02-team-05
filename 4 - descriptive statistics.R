@@ -67,6 +67,7 @@ chromswithY= c(chromosomes, chrnumbers[26])
 chromswithY[24]= 0
 
 library(viridisLite)
+par(mai= c(2,2,2,2))
 pie(chromswith0, clockwise= TRUE,border= FALSE, col= c(plasma(23),"lightgoldenrodyellow"), init.angle=180, radius=1, main=" Distribution of \n thyroid specific genes \n over chromosomes \n Dinkelacker, 2019, PhD thesis, University of Heidelberg")
 par(las=1)
 barplot(chromswithY, col=plasma(23), main=" Distribution of thyroid specific genes over chromosomes \n Dinkelacker, 2019, PhD thesis, University of Heidelberg", xlab= "chromosomes", ylab= "number of genes", ylim=c(0,20))
