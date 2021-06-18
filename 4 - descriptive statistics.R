@@ -54,14 +54,17 @@ uniqueinfos=allgenesandchromosomes[Index,]
 
 indexx=which(uniqueinfos$gene.symbol %in% symbol) # which genes are examined on our microarrays?
 finalinfos= uniqueinfos[indexx,]
+Ychrom= data.frame("inventedGene", "Y")
+colnames(Ychrom)= c("gene.symbol", "chromosome")
+finalinfos= bind_rows(finalinfos, Ychrom)
 View(finalinfos) 
 
 #final plots
 chrnumbers= table(finalinfos[,2])
-chrnumbersall= chrnumbers[c(2:23,26,143)]
-chromosomes= chrnumbersall[c(1,12,16:22,2:11,13:15,23)]
-chromswith0= c(chromosomes,chrnumbersall[24])
-chromswithY= c(chromosomes, chrnumbers[27])
+chromosomes= chrnumbers[c(2,13,17:23,3:12,14:16,25)]
+chromswith0= c(chromosomes,chrnumbers[24])
+chromswithY= c(chromosomes, chrnumbers[26])
+chromswithY[24]= 0
 
 library(viridisLite)
 pie(chromswith0, clockwise= TRUE,border= FALSE, col= c(plasma(23),"lightgoldenrodyellow"), init.angle=180, radius=1, main=" Distribution of \n thyroid specific genes \n over chromosomes \n Dinkelacker, 2019, PhD thesis, University of Heidelberg")
