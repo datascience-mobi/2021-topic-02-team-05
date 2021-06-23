@@ -1,57 +1,46 @@
-
 ### creating a new matrix for ANOVA test
 
-groups= c("radexp","radexp","radexp","radexp","radexp","radnonexp","radnonexp","radnonexp","radnonexp","healthy","healthy","healthy","healthy","healthy")
+groups= c("radexp","radexp","radexp","radexp","radexp","radexp","radexp","radexp","radexp","radexp",
+          "radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp",
+          "healthy","healthy","healthy","healthy","healthy","healthy","healthy","healthy","healthy","healthy")
 anovamatrix=t(thyroid.expr.matrix.sub)
 anovamatrix= cbind(groups,anovamatrix)
 
-  # anovamatrix[,1] = groups(exp, nonexp, healthy)
-  # anovamatrix[,i] = genes with their expression data
+# anovamatrix[,1] = groups(exp, nonexp, healthy)
+# anovamatrix[,i] = genes with their expression data
 
 
 # ANOVA Test for each gene
 sig.genes.vector=c()
 
-    for (i in 2:dim(anovamatrix)[2]){
-      if (summary.aov(aov(anovamatrix[,i]~ anovamatrix[,1]))[[1]][[1,5]] < 0.05){
-        sig.genes.vector = rbind(sig.genes.vector, colnames(anovamatrix)[i])
-      }
-     
-    }
+for (i in 2:dim(anovamatrix)[2]){
+  if (summary.aov(aov(anovamatrix[,i]~ anovamatrix[,1]))[[1]][[1,5]] < 0.05){
+    sig.genes.vector = rbind(sig.genes.vector, colnames(anovamatrix)[i])
+  }
+  
+}
 
 sig.genes.matrix= thyroid.expr.matrix.sub[sig.genes.vector,]
-  # matrix with expression data of our significant diffent expressed genes
-  
-  
-  
-### post hoc test for a single gene
-anovatry= aov(anovamatrix[,2] ~ anovamatrix[,1]) 
-  # anova test for testing the following steps
-  
-posthoc=TukeyHSD(anovatry)
-posthoc # results in matrix with differences in means, lower and upper border and p adjustment for each comparison
-plot(posthoc)
+# matrix with expression data of our significant diffent expressed genes
 
-  
 #install.packages("multcompView")
 library(multcompView)
- 
- ###preparation for boxplot
-chipnames =colnames(thyroid.expr.matrix.sub)
+
+###preparation for boxplot
 uniquegroups= unique(groups)
 
 sig.anova.matrix = cbind(groups, t(sig.genes.matrix))  
-  # [i,] are the chips, [,i] the genes and [,1] are our groups
-sig.genes.names= colnames(sig.anova.matrix)
+# [i,] are the chips, [,i] the genes and [,1] are our groups
+sig.genes.names= colnames(sig.anova.matrix[,-c(1)])
 
 my_colors <- c( 
-  rgb(143,199,74,maxColorValue = 255),
-  rgb(242,104,34,maxColorValue = 255), 
-  rgb(111,145,202,maxColorValue = 255)
+  "blue",
+  "green", 
+  "red"
 ) #defines colors
 
 ###The boxplots
-setwd("C:\\Users\\carin\\Downloads\\Datas\\Projekt\\plots")
+setwd("/Users/Line/Documents/tra_project/with_30_chips/plots")
 
 for (i in 2:dim(sig.anova.matrix)[2]){
   pdf(file = paste('posthocgene', colnames(sig.anova.matrix)[i], ".pdf"))
@@ -66,22 +55,18 @@ for (i in 2:dim(sig.anova.matrix)[2]){
   data= data.frame(groups, value)
   data$value= as.numeric(data$value) 
   
-    #boxplot coloured by group
+  #boxplot coloured by group
   posthoc.plot= boxplot(data$value~data$groups, 
-                 col=my_colors[as.numeric(Tukey.labels[,1])],
-                 xlab="tissue samples",
-                 ylab= "expression values",
-                 main= paste("posthoc of gene", sig.genes.names[i], "per group"))
+                        col=my_colors[as.factor(Tukey.labels[,1])],
+                        xlab="tissue samples",
+                        ylab= "expression values",
+                        main= paste("posthoc of gene", sig.genes.names[i], "per group"))
   over <- 0.1*max( posthoc.plot$stats[nrow(posthoc.plot$stats),] )
-  text( c(1:nlevels(data$groups)) ,
-        posthoc.plot$stats[nrow(posthoc.plot$stats),]+over , 
+  text( c(1:nlevels(as.factor(data$groups))) +0.5,
+        posthoc.plot$stats[nrow(posthoc.plot$stats),], 
         Tukey.labels[,1], pos=1,
-        col=my_colors[as.numeric(Tukey.labels[,1])] ) #labels the boxes in the plot
+        col=my_colors[as.factor(Tukey.labels[,1])] ) #labels the boxes in the plot
   
   dev.off()
 }
 
-
-
-
- 
