@@ -46,7 +46,7 @@ for (i in 2:dim(sig.anova.matrix)[2]){
   pdf(file = paste('posthocgene', colnames(sig.anova.matrix)[i], ".pdf"))
   posthoc= TukeyHSD( aov(sig.anova.matrix[,i] ~ sig.anova.matrix[,1])) # makes posthoc for each gene
   
-  Tukey.levels = posthoc[[1]][,4]
+  Tukey.levels = posthoc[[1]][,4] # posthoc[[1]][,4] gibt uns die level an (a,b,c, oder ab)
   Tukey.labels = data.frame(multcompLetters(Tukey.levels)["Letters"])
   Tukey.labels$groups = rownames(Tukey.labels)
   Tukey.labels = Tukey.labels [order(Tukey.labels$groups), ] #defines the 3 groups, and labels, if group is significant different
