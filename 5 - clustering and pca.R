@@ -16,6 +16,8 @@ plot(pca.t$x[,1], pca.t$x[,2],
      main = "PC1 vs. PC2 for radiation-exposed PTC, \nnot-exposed PTC and healthy thyroid tissue \n(Handkiewicz-Junak et all., 2016)") 
 legend("topright",c("radiation-exposed PTC","not-exposed PTC", "healthy"),fill=c("red","blue", "green"))
 
+# shows all 30 chips, shows that healthy and cancer tissues are different expressed
+
 dev.off()
 
 # Percentage of variance explained by dimensions
@@ -40,8 +42,10 @@ fviz_cluster(km3, data = t(thyroid.expr.matrix.sub),
              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
              geom = "point",
              ellipse.type = "convex", 
+             show.clust.cent = FALSE,
              ggtheme = theme_bw()
 )
+# "same plot" as above, but with defined clusters, ans cluster borders
 dev.off()
 
 km2 = kmeans(t(thyroid.expr.matrix.sub),centers=2,nstart = 100)
@@ -55,8 +59,11 @@ fviz_cluster(km2, data = t(thyroid.expr.matrix.sub),
              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
              geom = "point",
              ellipse.type = "convex", 
+             show.clust.cent = FALSE,
              ggtheme = theme_bw()
 )
+# shows that healthy and cancer tissue form 2 seperated cluster
+
 dev.off()
 
 #PCA of the sick patients only
@@ -96,6 +103,7 @@ fviz_cluster(km.sick2, data = t(thyroid.expr.matrix.sub)[1:20,],
              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
              geom = "point",
              ellipse.type = "convex", 
+             show.clust.cent = FALSE,
              ggtheme = theme_bw()
 )
 dev.off()
@@ -108,7 +116,8 @@ pdf(file="pca_sick_kmeans_3")
 fviz_cluster(km.sick3, data = t(thyroid.expr.matrix.sub)[1:20,],
              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
              geom = "point",
-             ellipse.type = "convex", 
+             ellipse.type = "convex",
+             show.clust.cent = FALSE,
              ggtheme = theme_bw()
 )
 dev.off()
