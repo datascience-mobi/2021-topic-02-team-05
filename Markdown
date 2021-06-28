@@ -258,13 +258,13 @@ col.pca.t = ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radexp.matrix
                    ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radnonexp.matrix), 
                           "blue", 
                           "green"))
-pdf(file="pca_genes")
+
 plot(pca.t$x[,1], pca.t$x[,2], 
      col= col.pca.t,
      pch=16,
      xlab='PC1',ylab='PC2',
      main = "PC1 vs. PC2 for radiation-exposed PTC (red), \nnot-exposed PTC (blue) and healthy thyroid tissue (green) \n(Handkiewicz-Junak et all., 2016)") 
-dev.off()
+
 # shows all 30 chips, shows that healthy and cancer tissues are different expressed
 
 
@@ -291,16 +291,15 @@ cluster3.1 = c(which(km3$cluster==3))
 
 library("factoextra")
 
-setwd("/Users/Line/Documents/tra_project/with_30_chips/plots")
-pdf(file="pca_genes_kmeans_3")
+
 fviz_cluster(km3, data = t(thyroid.expr.matrix.sub),
              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
              geom = "point",
              ellipse.type = "convex", 
              ggtheme = theme_bw()
 )
-dev.off()
-# "same plot" as above, but with defined clusters, ans cluster borders
+
+# "same plot" as above, but with defined clusters, and cluster borders
 
 
 
@@ -311,7 +310,7 @@ cluster1.2 = c(which(km2$cluster==1))
 cluster2.2 = c(which(km2$cluster==2))
 cluster3.2 = c(which(km2$cluster==3))
 
-pdf(file="pca_genes_kmeans_2")
+
 fviz_cluster(km2, data = t(thyroid.expr.matrix.sub),
              palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
              geom = "point",
@@ -320,10 +319,10 @@ fviz_cluster(km2, data = t(thyroid.expr.matrix.sub),
 )
 
 # shows that healthy and cancer tissue form 2 seperated cluster
-dev.off()
+
 
 ```
-To investigate, which of the 360 TRA's showed a significant change in gene expression upon the three different groups, we performed an ANOVA test for each gene and stored the 134 significantly different expressed ones in a new matrix. 
+To investigate, which of the 360 TRA's showed a significant change in gene expression upon the three different groups, we performed an ANOVA test for each gene and stored the 153 significantly different expressed ones in a new matrix. 
 ```{r ANOVA, echo=FALSE} 
 ### creating a new matrix for ANOVA test
 
@@ -344,6 +343,7 @@ anovamatrix= cbind(groups,anovamatrix)
 sig.genes.vector=c()
 
 #anovamatrix = t(thyroid.expr.matrix.sub) with an extra column that specifies the corresponding group of each chip
+#**or** anovamatrix[1:3,]
 
 for (i in 2:dim(anovamatrix)[2]){
   if (summary.aov(aov(anovamatrix[,i]~ anovamatrix[,1]))[[1]][[1,5]] < 0.05){
@@ -353,8 +353,8 @@ for (i in 2:dim(anovamatrix)[2]){
 }
 
 sig.genes.matrix= thyroid.expr.matrix.sub[sig.genes.vector,]
-# when the difference in gene expression for gene i between two groups is higher than 5%, the corresponding gene name (=> colnames(anovamatrix)[i]) is added in the vector sig.genes.vector. 
 
+# when the difference in gene expression for gene i between two groups is higher than 5%, the corresponding gene name (=> colnames(anovamatrix)[i]) is added in the vector sig.genes.vector. 
 #The sig.genes.matrix contains the expression values of these genes.
 ```
 
@@ -409,7 +409,7 @@ posthoc= TukeyHSD( aov(sig.anova.matrix[,i] ~ sig.anova.matrix[,1])) # makes pos
 **So, next step would be the biological clustering. wich genes higher expressed in cancer? New? And regression analysis?**
 
 
-We found out, that the total expression of radiation exposed and non exposed tissue did not differ as much as we thought it would. So we concentrated on the cancer tissue and performed another PCA and a k-means clustering. As expected, the chips could not be seperated in two groups according to their radiation exposure. 
+While doing the PCA, we found out, that the total expression of radiation exposed and non exposed tissue did not differ as much as we thought it would. So we concentrated on the cancer tissue and performed another PCA and a k-means clustering. As expected, the chips could not be seperated in two groups according to their radiation exposure. 
 The elbow method,we used to define the perfect number of clusters, revealed, that the cancer tissues should be divided into three groups, illustrated below.
 
 ```{r PCA sick only, echo=FALSE}
@@ -423,13 +423,13 @@ fviz_cluster(km.sick3, data = t(thyroid.expr.matrix.sub)[1:20,],
              ggtheme = theme_bw()
 )
 ```
-Next, we examined the gene expression pattern of these three cancer subtypes. Again, we performed an ANOVA test, defining the genes, that are significantly different expressed in one of our subtypes. We found 192. A foldchange analysis helped us to reduce them to 32 genes. 
+Next, we examined the gene expression pattern of these three cancer subtypes. Again, we performed an ANOVA test, defining the genes, that are significantly different expressed in one of our subtypes. We found 134. A foldchange analysis helped us to reduce them to 32 genes. 
 
 ```{r foldchange, echo=TRUE}
-#fldchange code, den würde ich zeigen
+#foldchange code, den würde ich zeigen
 ```
 
-As we performed the vs-normalisation right at the beginning, the fold change is the absolute difference in gene expression, and we do not need to use the logarithm. We defined 8 as our treshold and continued with the genes, that are expressed eight times higher in one subtype than in another one.
+As we performed the vs-normalisation right at the beginning, the fold change is the absolute difference in gene expression, and we do not need to use the logarithm. We defined 8 as our treshold and continued with the genes, that are expressed at least eight times higher in one subtype than in another one.
 
 
 With these 32 genes we performed a multinominal regression analysis. We wanted to predict, due to the expression pattern based on these genes, the cancer subtype. For the model we used 6 of our 20 cancer tissue chips.
