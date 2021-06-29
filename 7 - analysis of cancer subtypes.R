@@ -26,22 +26,6 @@ for (i in 2:dim(cancer.anovamatrix)[2]){
 }
 
 cancer.subtype.sig.genes.matrix= cancer.subtype.matrix[cancer.sig.genes.vector,]
-# matrix with expression data of our significant diffent expressed genes between the three cancer subtypes
-
-#foldchange
-install.packages("gtools")
-library(gtools)
-
-foldchange.vector=c()
-
-for (i in 2:135) {
-  if(abs(foldchange(foldchange(mean(as.numeric(subtype.matrix[1:4,i])),
-                        mean(as.numeric(subtype.matrix[5:9,i]))),
-             mean(as.numeric(subtype.matrix[10:20,i])))) >= 8){
-    foldchange.vector = rbind(foldchange.vector,colnames(subtype.matrix)[i])
-  }
-}
-View(foldchange.vector)
-
+# matrix with expression data of our significant different expressed genes between the three cancer subtypes
 
 
