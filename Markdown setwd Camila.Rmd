@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 0. Gliederung Markdown:
+### Gliederung Markdown:
 1. Introduction 
     - biology 
     - our data set 
@@ -35,7 +35,7 @@ We were working with 14 samples of thyroid tissues, in which five of them were e
 
 After performing a (single chip) quality control we decided to use all fourteen chips for our analysis: after normalising the signal intensity of the chips, the gene expression was **equally? **distributed, the RNA degradation plot did not show any quality deficiencies, and as we scattered all chips against each other they showed the same pattern.
 
-##  Quality Control (Plots)
+###  Quality Control (Plots)
 
 
 ```{r all code (for discription), include=FALSE}
