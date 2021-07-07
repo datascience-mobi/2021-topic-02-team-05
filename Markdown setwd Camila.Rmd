@@ -171,27 +171,31 @@ genes2= data.frame(th.genes2[,3],th.genes2[,7])
 genes3= data.frame(th.genes3[,3],th.genes3[,7])
 genes6= data.frame(th.genes6[,3],th.genes6[,11])
 
-
 colnames(genes1)= c("gene.symbol", "chromosome")
 colnames(genes2)= c("gene.symbol", "chromosome")
 colnames(genes3)= c("gene.symbol", "chromosome")
-colnames(genes4)= c("gene.symbol", "chromosome")
 colnames(genes6)= c("gene.symbol", "chromosome")
 
-allgenesandchromosomes= rbind(genes1,genes2,genes3, genes4,genes6) # all genes of all TRA lists together
+allgenesandchromosomes= rbind(genes1,genes2,genes3,genes6) # all genes of all TRA lists together
 uniquegenes= duplicated(allgenesandchromosomes$gene.symbol) # selecting unique genes only
 Index= which(uniquegenes==FALSE )
 uniqueinfos=allgenesandchromosomes[Index,]
 
 indexx=which(uniqueinfos$gene.symbol %in% symbol) # which genes are examined on our microarrays?
-finalinfos= uniqueinfos[indexx,] # 400 genes
+finalinfos= uniqueinfos[indexx,]
+Ychrom= data.frame("inventedGene", "Y")
+colnames(Ychrom)= c("gene.symbol", "chromosome")
+finalinfos= rbind(finalinfos, Ychrom)
+View(finalinfos) 
 
 #final plots
-chrnumbers= table(finalinfos[,2])
-chromosomes= chrnumbers[c(2,13,17:23,3:12,14:16,25)]
-chromswith0= c(chromosomes,chrnumbers[24])
-chromswithY= c(chromosomes, chrnumbers[26])
+chrnumbers= table(finalinfos[,2]) #wie ift ein chromosme vorkommt 
+chromosomes= chrnumbers[c(2,13,17:23,3:12,14:16,26)]
+chromswith0= c(chromosomes,chrnumbers[25])
+chromswithY= c(chromosomes, chrnumbers[27])
 chromswithY[24]= 0
+View(chromosomes)
+
 ```
 
 **Dieser Teil muss überarbeitet werden, je nachdem was wir jetzt wirklich machen**
