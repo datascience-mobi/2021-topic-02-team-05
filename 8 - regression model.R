@@ -4,6 +4,7 @@ subtype.matrix = rbind(cancer.groups, cancer.subtype.sig.genes.matrix)
 subtype.matrix = t(subtype.matrix)
 modelgenes.sub = c()
 
+library(multcompView)
 for (i in 2:dim(subtype.matrix)[2]){
   posthoc= TukeyHSD( aov(subtype.matrix[,i] ~ subtype.matrix[,1]))
   Tukey.levels = posthoc[[1]][,4]
@@ -30,33 +31,26 @@ library("nnet")
 #defining subtype 1 as reference category
 subtype.matrix[,1]= relevel(factor(subtype.matrix[,1]), ref = "subtype 1")
 
-#regeression model
+#regeression model (training)
 model.matrix.sub=subtype.matrix[,modelgenes.sub]
 model.matrix.sub= cbind(cancer.groups,model.matrix.sub)
 
 #Versuch Expressionswerte numerisch zu machen (bis jetzt ohne Erfolg)
-model.matrix.sub =as.data.frame(model.matrix.sub)
-model.matrix.sub[,2:12]=numeric(model.matrix.sub[,2:12])
-model.matrix.sub[,2:12]=as.matrix(apply(model.matrix.sub[,2:12],2,as.numeric))
-model.matrix.sub =cbind(cancer.groups,as.numeric(model.matrix.sub[,2:12]))
+model.matrix.sub=as.data.frame(model.matrix.sub)
+for (i in 2:12){
+  model.matrix.sub[,i]=apply(model.matrix.sub[,i,drop=F],2,as.numeric)
+}
 
 subtype.model=multinom(cancer.groups~.,
-                       data = as.data.frame(model.matrix.sub[c(1,2,5,6,15,16,17,18,19,20),]))
+                       data = as.data.frame(model.matrix.sub[c(1,2,3,5,6,7,8,14,15,16,17,18,19,20),]))
 
+#regressionmodel (prediction)
+predict.subtype.1 = predict(subtype.model, model.matrix.sub[c(1,2,3,5,6,7,8,14,15,16,17,18,19,20),])
+predict.subtype.2 = predict(subtype.model, model.matrix.sub[c(4,9,10,11,12,13),])    
 
-#welche Variablen sind wichtig (nächstes Mal)
-
-#
-predict.subtype.1 = predict(subtype.model, model.matrix.sub[c(1,2,5,6,15,16,17,18,19,20),])
-predict.subtype.2 = predict(subtype.model, model.matrix.sub[c(3,4,7,8,9,10,11,12,13,14),])  #Error   
-
-#dioganal matrix if all subtypes were identified correctly
-tab1=table(predict.subtype.1, model.matrix.sub[c(1,2,5,6,15,16,17,18,19,20),1])
+#dioganal matrix if all subtypes were identified correctly 
+tab1=table(predict.subtype.1, model.matrix.sub[c(1,2,3,5,6,7,8,14,15,16,17,18,19,20),1])
 tab1 #is diagonal
-
-
-
-levels(as.factor(model.matrix.sub[c(1,2,5,6,15,16,17,18,19,20),]))
-
-class(model.matrix.sub[,2])
-class(model.matrix.sub[3,2])
+tab2=table(predict.subtype.2, model.matrix.sub[c(4,9,10,11,12,13),1])
+tab2 #is diagonal
+#all subtypes are predicted correctly
