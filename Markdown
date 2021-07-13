@@ -496,3 +496,17 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3037461/
 ```{r echo=FALSE, fig.cap="the 360 TRAs"}
 list(rownames(thyroid.expr.matrix.sub))
 ```
+```{r echo=FALSE, fig.cap="the 153 significantly different expressed genes between radiation-exposed, not-exposed and healthy samples"}
+list(rownames(sig.genes.matrix))
+```
+```{r echo=FALSE, fig.cap="the 134 significantly different expressed genes between at least two of the three cancer subtypes"}
+list(rownames(cancer.subtype.sig.genes.matrix))
+```
+```{r echo=FALSE, fig.cap="the eleven significantly different expressed genes between all three cancer subtypes"}
+list(modelgenes.sub)
+```
+
+## 6. Appendix
+```{r echo=FALSE, fig.cap="the 360 TRAs"}
+list(rownames(thyroid.expr.matrix.sub))
+```
