@@ -169,14 +169,14 @@ finalinfos= uniqueinfos[indexx,]
 Ychrom= data.frame("inventedGene", "Y")
 colnames(Ychrom)= c("gene.symbol", "chromosome")
 finalinfos= rbind(finalinfos, Ychrom)
-View(finalinfos) 
+ 
 #final plots
 chrnumbers= table(finalinfos[,2]) #wie ift ein chromosme vorkommt 
 chromosomes= chrnumbers[c(2,13,17:23,3:12,14:16,26)]
 chromswith0= c(chromosomes,chrnumbers[25])
 chromswithY= c(chromosomes, chrnumbers[27])
 chromswithY[24]= 0
-View(chromosomes)
+
 ```
 
 
