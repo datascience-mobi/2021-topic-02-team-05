@@ -1,0 +1,67 @@
+###PCA (with 30 chips)
+
+#PCA of genes
+pca.t <- prcomp(t(thyroid.expr.matrix.sub), center = TRUE, scale = TRUE)
+summary(pca.t) #with PC1 and PC2 40,87% of the variance are explained
+col.pca.t = ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radexp.matrix), 
+                   "red", 
+                   ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radnonexp.matrix), 
+                          "blue", 
+                          "green"))
+pdf(file="pca_genes")
+plot(pca.t$x[,1], pca.t$x[,2], 
+     col= col.pca.t,
+     pch=16,
+     xlab='PC1 (25,01 %)',ylab='PC2 (15,86 %)',
+     main = "PC1 vs. PC2 for radiation-exposed PTC, \nnot-exposed PTC and healthy thyroid tissue \n(Handkiewicz-Junak et all., 2016)") 
+legend("topright",c("radiation-exposed PTC","not-exposed PTC", "healthy"),fill=c("red","blue", "green"))
+
+# shows all 30 chips, shows that healthy and cancer tissues are different expressed
+
+dev.off()
+
+# Percentage of variance explained by dimensions
+install.packages('factoextra')
+library("factoextra")
+eigenvalue <- round(get_eigenvalue(pca.t), 1)
+variance.percent <- eigenvalue$variance.percent
+head(eigenvalue)
+
+#k-means
+km3 = kmeans(t(thyroid.expr.matrix.sub),centers=3,nstart = 100)
+km3$cluster
+cluster1.1 = c(which(km3$cluster==1))
+cluster2.1 = c(which(km3$cluster==2))
+cluster3.1 = c(which(km3$cluster==3))
+
+library("factoextra")
+
+setwd("/Users/Line/Documents/tra_project/with_30_chips/plots")
+pdf(file="pca_genes_kmeans_3")
+fviz_cluster(km3, data = t(thyroid.expr.matrix.sub),
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             show.clust.cent = FALSE,
+             ggtheme = theme_bw()
+)
+# "same plot" as above, but with defined clusters, ans cluster borders
+dev.off()
+
+km2 = kmeans(t(thyroid.expr.matrix.sub),centers=2,nstart = 100)
+km2$cluster
+cluster1.2 = c(which(km2$cluster==1))
+cluster2.2 = c(which(km2$cluster==2))
+cluster3.2 = c(which(km2$cluster==3))
+
+pdf(file="pca_genes_kmeans_2")
+fviz_cluster(km2, data = t(thyroid.expr.matrix.sub),
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             show.clust.cent = FALSE,
+             ggtheme = theme_bw()
+)
+# shows that healthy and cancer tissue form 2 seperated cluster
+
+dev.off()
