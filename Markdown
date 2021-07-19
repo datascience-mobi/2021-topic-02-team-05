@@ -1,10 +1,6 @@
 ---
-output:
-  pdf_document: default
-  html_document: default
----
 title: "Data Science project: thyroid specific antigens"
-subtitle: "Group 5, topic 2 \nSupervisors: Dr. Carl Herrmann, Dr. Maria Dinkelacker, Nils Mechtel"
+subtitle: "Group 5, topic 2 Supervisors: Dr. Carl Herrmann, Dr. Maria Dinkelacker, Nils Mechtel"
 author: "Camila Vacas, Line Weiß, Carina Keßler"
 date: "19/7/2021"
 output: pdf_document
@@ -14,7 +10,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-> Introduction
+# Introduction
 
 Tissue restricted antigens (TRA) are those genes which are expressed in at most five out of fourty-five tissues, and additionally in the lymph system, e.g. in the medullary thymic epithelial cells (mTECs), where the negative selection of the T-cells takes place (Kyewske and Klein, 2006). A defective regulation of TRA expression in mTECs can lead to autoimmune diseases, caused by the presence of T-cells reacting to a self-antigen. In most patients of e.g. the Hashimoto's or Grave's disease, the most common autoimmune disorders concerning the thyroid, are antibodies present against the thyroglobulin or the thyroid peroxidase. 
 Due to this negative selection, the immune system cannot react properly to tumor cells which express tumor associated antigens (TAA), like differentiation or onco-fetal antigens (Kyewske and Klein,2006). The tumor escapes the immune system and can grow. Radiation has a positive impact on tumor development as well, especially in thyroid cancer: the thyroid is higly sensitive to radiation exposure and it is likely to develop long-term effects. Though females tend to develope more often thyroid cancer than males, youth is a greater risk factor. (Albi, 2017)
@@ -28,12 +24,10 @@ Our first step of the quality control was the single chip control, and we decide
 
 ![Caption for the picture 1](/Users/Line/Documents/tra_project/boxplot_thyroid_rawdata){width=50%}
 ![Caption for the picture 2](/Users/Line/Documents/tra_project/boxplot_thyroid_vsnrma_normalized){width=50%}
+Figure 0: gene expression in the thyroid tissue of 14 patients, who were either exposed to radion, not exposed to radiation or healthy, before and after normalization.The boxplots show the distribution of the expression of all genes per chip before and after normalization. The goal is to bring the quantiles more or less into line, which makes the data comparable.  
 
-**Figure 1 and 2: gene expression in the thyroid tissue of 14 patients, who were either exposed to radion, not exposed to radiation or healthy, before and after normalization.** The boxplots show the distribution of the expression of all genes per chip before and after normalization. The goal is to bring the quantiles more or less into line, which makes the data comparable.
 
-
-```{r all code (for discription), include=FALSE}
-tinytex::uninstall_tinytex()
+```{r all_code_(for_description), include=FALSE}
 
 library(affy)
 library(vsn)
@@ -158,8 +152,8 @@ colnames(genes1)= c("gene.symbol", "chromosome")
 colnames(genes2)= c("gene.symbol", "chromosome")
 colnames(genes3)= c("gene.symbol", "chromosome")
 colnames(genes6)= c("gene.symbol", "chromosome")
-allgenesandchromosomes= rbind(genes1,genes2,genes3,genes6) # all genes of all TRA lists together
-uniquegenes= duplicated(allgenesandchromosomes$gene.symbol) # selecting unique genes only
+allgenesandchromosomes= rbind(genes1,genes2,genes3,genes6) #all genes of all TRA lists together
+uniquegenes= duplicated(allgenesandchromosomes$gene.symbol) 
 Index= which(uniquegenes==FALSE )
 uniqueinfos=allgenesandchromosomes[Index,]
 indexx=which(uniqueinfos$gene.symbol %in% symbol) # which genes are examined on our microarrays?
@@ -173,64 +167,63 @@ chromosomes= chrnumbers[c(2,13,17:23,3:12,14:16,26)]
 chromswith0= c(chromosomes,chrnumbers[25])
 chromswithY= c(chromosomes, chrnumbers[27])
 chromswithY[24]= 0
+
 ```
-
-
 
 In the next steps we focused on the TRAs in the thyroid (our genes of interest), and extracted them by using five TRA lists (from human and mouse samples). We found 360 TRAs of thyroid tissue on our microarrays (see appendix) and created a matrix containig our genes of interest and their expression data. This matrix was the basis for our following analyses.
 
-
-
-
 We wanted to find out which of these thyroid specific genes are differentially expressed in low-dose radiation-induced PTC, sporadic PTC and healthy thyroid tissue and how the gene expression differs between the three groups. 
 
-
->Main Part
+\newpage
+# Main Part
   
-We started our project by taking a closer look at the data. We found out, that our genes of interest are spread over all human chromosomes, except for the Y chromosome. Unfortunately we cannot say on which chromosomes the most thyroid specific TRAs can be found, due to the missing information of chromosome localisation of almost half of our genes. 
+We started our project by taking a closer look at the data. We found out, that our genes of interest are spread over all human chromosomes, except for the Y chromosome. Unfortunately we cannot say on which chromosomes the most thyroid specific TRAs can be found, due to the missing information of chromosome localisation of almost half of our genes.   
 
-
-```{r_chromosome_plot, echo=FALSE, fig.capture="Distribution of thyroid specific genes over chromosomes.Only the genes with the information of chromosome localisation were taken into consideration. The TRAs of the thyroid are spread over almost all human chromosomes."}
+  
+  
+```{r chromosomeplot, echo=FALSE, fig.cap="Distribution of thyroid specific genes over chromosomes.Only the genes with the information of chromosome localisation were taken into consideration. The TRAs of the thyroid are spread over almost all human chromosomes.", fig.align="center"}
 library(viridisLite)
 par(las=1)
 barplot(chromswithY, col=plasma(23), cex.names=0.5,main=" Distribution of thyroid specific genes over chromosomes \n Dinkelacker, 2019, PhD thesis, University of Heidelberg", xlab= "chromosomes", ylab= "number of genes", ylim=c(0,20))
 abline(h=c(5,10,15,20), lty=3) # makes the grey lines. Tiping the barplot-code again, but with "add=TRUE" puts the lines in the background
 barplot(chromswithY, col=plasma(23), add=TRUE, cex.names=0.5,main=" Distribution of thyroid specific genes over chromosomes \n Dinkelacker, 2019, PhD thesis, University of Heidelberg", xlab= "chromosomes", ylab= "number of genes", ylim=c(0,20))
 ```
-
+\newpage
 We also created a heatmap to get an overview of the gene expression of the thyroid specific antigens (see below).
 
 
-```{r heat map, echo=FALSE, fig.capture= "Heatmap of 20 of our genes of interest. This heatmap illustrates the gene expression of the first 20 thyroid specific antigens in our matrix."}
+```{r heatmap, echo=FALSE, fig.cap= "Heatmap of 20 of our genes of interest. This heatmap illustrates the gene expression of the first 20 thyroid specific antigens in our matrix."}
 littlematrix= thyroid.expr.matrix.sub[1:20,c(1,2,6,7,9,11:13,20:25)]
 library(pheatmap)
-heat=pheatmap(littlematrix, 
-                             main = "Gene expression of thyroid TRA's \nin PTC and healthy thyroid tissue (GSE35570) \n(Handkiewicz-Junak et all., 2016)",
-                             cluster_rows = F, 
-                             cluster_cols = F, 
-                             cellheight = 3, 
-                             cellwidth = 3,
-                             legend =TRUE,
-                             fontsize = 3,
-                             gaps_col = c(5,9)
+pheatmap(littlematrix, 
+         main = "Gene expression of thyroid TRA's \nin PTC and healthy thyroid tissue (GSE35570) \n(Handkiewicz-Junak et  all., 2016)",
+         cluster_rows = F, 
+         cluster_cols = F, 
+         cellheight = 3, 
+         cellwidth = 3,
+         legend =TRUE,
+         fontsize = 3,
+         gaps_col = c(5,9)
                )
-heat
+
 ```
 
 
 We decided to perform a principal component analysis (PCA) to detect any patterns. We coloured the different spots according to the tissue sample the microarray was prepared with. The five healthy samples and the five radiation exposed samples formed both a clear individual cluster. Two of the samples of the sick patients, who were not exposed to radiation, formed a seperated cluster, while the other two seemed to be more similiar to the radiation exposed samples.
 
+                       
+![PCA 14 chips](/Users/Line/Documents/tra_project/thyroid_cancer_sessions/pca_genes.jpg){width=50%}
+  
+Figure 1.2: PCA of the 14 chips colored according to to tissue origin.The healthy tissue samples form a clear cluster, while the sick samples did not. 
 
 
-![PCA 14 chips] (~/Desktop/Bioinfo/Data Science Project/pca_genes.jpg){width=50%})
+
 
 To find out, wether those were just outliers, we repeated the PCA with 30 chips, 10 chips in each group. This time it was clear, that the healthy samples formed one cluster and the sick samples another one. 
 
-
-```{r echo=FALSE, fig.capture="PCA of the 30 chips colored according to tissue origin.The  healthy tissue samples form a clear cluster", fig.height=4, fig.width=4}
+```{r PCA_with_30_chips, echo=FALSE, fig.cap="PCA of the 30 chips colored according to tissue origin.The healthy tissue samples form a clear cluster", fig.align="center",out.width=3}
 #PCA with 30 chips
 pca.t <- prcomp(t(thyroid.expr.matrix.sub), center = TRUE, scale = TRUE)
-summary(pca.t) #with PC1 and PC2 40,87% of the variance are explained
 col.pca.t = ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radexp.matrix), 
                    "red", 
                    ifelse(colnames(thyroid.expr.matrix.sub) %in% colnames(radnonexp.matrix), 
@@ -246,15 +239,19 @@ legend("topright",c("radiation-exposed PTC","not-exposed PTC", "healthy"),fill=c
 # shows all 30 chips, shows that healthy and cancer tissues are different expressed
 # Percentage of variance explained by dimensions
 ```
-
-To prove this, we performed k-means clustering and used the elbow method to determine the best number of clusters, which was two. 
-
-```{r, echo=FALSE, fig.capture= "PCA of the 30 chips colored according to k-means clustering.As suspected, the healthy samples and the sick ones formed each one cluster.",fig.height=4, fig.width=4}
+\newpage
+To prove this, we performed k-means clustering and used the elbow method to determine the best number of clusters, which was two.  
+```{r library, include=FALSE}
 #install.packages('factoextra')
 library("factoextra")
+library("ggplot2")
+```
+
+
+```{r kmeans_30_chips, echo=FALSE, fig.cap= "PCA of the 30 chips colored according to k-means clustering.As suspected, the healthy samples and the sick ones formed each one cluster.",fig.height=4, fig.width=5, fig.align= "center"}
+
 #k-means 
 km2 = kmeans(t(thyroid.expr.matrix.sub),centers=2,nstart = 100)
-km2$cluster
 cluster1.2 = c(which(km2$cluster==1))
 cluster2.2 = c(which(km2$cluster==2))
 cluster3.2 = c(which(km2$cluster==3))
@@ -270,7 +267,7 @@ fviz_cluster(km2, data = t(thyroid.expr.matrix.sub),
 ```
 
 To investigate, which of the 360 TRA's showed a significant change in gene expression upon the three different groups, we performed an ANOVA test for each gene. We found 153 significantly different expressed genes (see appendix) and stored them in a new matrix. 
-```{r anova.groups, echo=FALSE} 
+```{r anovagroups, echo=FALSE} 
 ### creating a new matrix for ANOVA test
 groups= c("radexp","radexp","radexp","radexp","radexp","radexp","radexp","radexp","radexp","radexp",
           "radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp","radnonexp",
@@ -283,7 +280,7 @@ anovamatrix= cbind(groups,anovamatrix)
 #**or** anovamatrix[1:3,]
 ```
 
-``` {r anova, echo=TRUE}
+``` {r anovatest, echo=TRUE}
 # ANOVA Test for each gene
 sig.genes.vector=c()
 
@@ -299,8 +296,8 @@ for (i in 2:dim(anovamatrix)[2]){
 sig.genes.matrix= thyroid.expr.matrix.sub[sig.genes.vector,]
 # the sig.genes.matrix contains the expression values of these genes.
 ```
-
-The posthoc test of each of the significantly different expressed genes showed us how the acccording gene was expressed in the three groups and between which of the groups was a significant difference. For that we used the TukeyHSD function to perform the tukey honestly significant differnce posthoc test. It enables us to compare the differences of the mean gene expression between our three groups. It helped us with the visualisation and analysis of the ANOVA test as well. 
+\newpage
+The posthoc test of each of the significantly different expressed genes showed us how the acccording gene was expressed in the three groups and between which of the groups was a significant difference. For that we used the TukeyHSD function to perform the tukey honestly significant differnce posthoc test. It enables us to compare the differences of the mean gene expression between our three groups. It helped us with the visualisation and analysis of the ANOVA test as well.   
 
 
 ```{r posthoc, include=FALSE}
@@ -325,8 +322,7 @@ my_colors <- c(
 ```
 
 
-
-```{r posthoc plot 1 gene, echo=FALSE, fig.capture= "Example of a result of the posthoc test for the gene DCN. This gene is significantly different expressed in the healthy samples compared to the sick samples. DCN is higher expressed in healthy tissue than in cancer tissue. ", fig.width=4, fig.height=4}
+```{r posthoc_plot_one_gene, echo=FALSE, fig.cap= "Example of a result of the posthoc test for the gene DCN. This gene is significantly different expressed in the healthy samples compared to the sick samples. DCN is higher expressed in healthy tissue than in cancer tissue. ", fig.width=4, fig.height=4.5}
 posthoc= TukeyHSD( aov(sig.anova.matrix[,41] ~ sig.anova.matrix[,1]))
 Tukey.levels = posthoc[[1]][,4]
 Tukey.labels = data.frame(multcompLetters(Tukey.levels)["Letters"])
@@ -351,16 +347,12 @@ posthoc.plot= boxplot(data$value~data$groups,
 
 ```
 
-
-
-
 Due to the results of the PCA, which showed us that the gene expression of radiation exposed and non-exposed tissue did not differ as much as we thought it would, we decided to concentrate ourselfs on the cancer tissue further. We performed another PCA and a k-means clustering to investigate whether there is another pattern within these groups.
 
 
 We found that the chips could not be seperated into two groups according to their radiation exposure. 
-The elbow method,we used to define the perfect number of clusters, revealed, that the cancer tissues should be divided into three groups, illustrated below. We assumed that these could be three different PTC subtypes
-
-```{r PCA_sick_only, echo=FALSE, fig.capture="PCA of the 20 sick samples only, colored according to k-means clustering. The division of these 20 chips suggest that there are three PTC subtypes.  " ,fig.width=4, fig.height=4}
+The elbow method,we used to define the perfect number of clusters, revealed, that the cancer tissues should be divided into three groups, illustrated below. We assumed that these could be three different PTC subtypes.
+```{r PCA_sick_only, echo=FALSE, fig.cap="PCA of the 20 sick samples only, colored according to k-means clustering. The division of these 20 chips suggest that there are three PTC subtypes.  " ,fig.width=5, fig.height=4, fig.align="center"}
 #seperating the chips according to the cancer subtype
 load("km_sick3.RData")
 load("sub_matrix.RData")
@@ -376,9 +368,10 @@ fviz_cluster(km.sick3, data = t(thyroid.expr.matrix.sub)[1:20,],
              show.clust.cent = FALSE,
 )
 ```
+\newpage
 To look into this, we examined the gene expression pattern of these three cancer subtypes. We performed another ANOVA test, defining the genes, that are significantly different expressed in our subtypes. We found 134 genes (see appendix). 
 
-```{r ANOVA sick chips, include=FALSE}
+```{r ANOVA_sick_chips, include=FALSE}
 cluster.sick.1.matrix = thyroid.expr.matrix.sub[,cluster.sick.1]
 cluster.sick.2.matrix = thyroid.expr.matrix.sub[,cluster.sick.2]
 cluster.sick.3.matrix = thyroid.expr.matrix.sub[,cluster.sick.3]
@@ -404,17 +397,12 @@ for (i in 2:dim(cancer.anovamatrix)[2]){
 cancer.subtype.sig.genes.matrix= cancer.subtype.matrix[cancer.sig.genes.vector,]
 # matrix with expression data of our significant different expressed genes between the three cancer subtypes
 
-
-
-View(cancer.subtype.sig.genes.matrix)
-# matrix with expression data of our significant different expressed genes between the three cancer subtypes
 ```
 
 We wanted to design a regression model to predict the cancer subtype through the expression values of the significant genes. Since 134 variables are to many to work with, we performed another posthoc TukeyHSD test and selected the genes that are differentially expressed in all three subtypes (see appendix). With these eleven genes we trained our multinominal logistic regression model with 14 chips and tested it on another six chips.
 
-```{r evaluation regression model, include=FALSE}
-#posthoc to find out which genes are significantly expressed in all 
-#three subtypes to use those for the regression model
+```{r evaluation_regression_model, include=FALSE}
+
 subtype.matrix = rbind(cancer.groups, cancer.subtype.sig.genes.matrix)
 subtype.matrix = t(subtype.matrix)
 modelgenes.sub = c()
@@ -431,7 +419,7 @@ for (i in 2:dim(subtype.matrix)[2]){
 modelgenes.sub
 
 #intsalling necessary packages for regression model
-install.packages("nnet")
+#install.packages("nnet")
 library("nnet")
 
 #defining subtype 1 as reference category
@@ -455,7 +443,7 @@ predict.subtype.1 = predict(subtype.model, model.matrix.sub[c(1,2,3,5,6,7,8,14,1
 predict.subtype.2 = predict(subtype.model, model.matrix.sub[c(4,9,10,11,12,13),])    
 ```
 
-```{r evaluation regression model, echo=FALSE,lable="Evaluation of the multinominal regression model. The first table shows the accuracy of the regression model applied on the 14 chips it was trained with. The second table shows the accuracy of the regression model on the six chips it was tested on. The accuracy was 100 %."}
+```{r evaluation_regression_model_2, echo=FALSE, fig.cap="Evaluation of the multinominal regression model. The first table shows the accuracy of the regression model applied on the 14 chips it was trained with. The second table shows the accuracy of the regression model on the six chips it was tested on. The accuracy was 100 %."}
 #dioganal matrix if all subtypes were identified correctly 
 tab1=table(predict.subtype.1, model.matrix.sub[c(1,2,3,5,6,7,8,14,15,16,17,18,19,20),1])
 tab1 #is diagonal
@@ -463,15 +451,15 @@ tab2=table(predict.subtype.2, model.matrix.sub[c(4,9,10,11,12,13),1])
 tab2 #is diagonal
 #all subtypes are predicted correctly
 ```
-
-> Results:
+\newpage
+# Results:
 
 We identified 560 TRAs in the thyroid, but only 360 were represented on the microarray-type we used. Out of these 360 TRAs 153 were significantly different expressed between the three groups healthy, exposed and not-exposed to radiation. 
 Through PCA we came across that there seemed to be no difference in the gene expression between the two carcinogenic tissue types. However, there was a clear difference between the gene expression in the healthy patients compared to the sick ones. We focused on the sick samples further and found three clear groups that differ in gene expression and suspected that we had discovered three subtypes of PTC. 
 Moreover, we decided to create a regression model that would enable us to determine the subtype according to the gene expression. Therefore, we identified the 134 genes that were significantly different expressed between at least two of the subtypes using an ANOVA test. But since 134 genes were too many we narrowed them down to eleven genes, which were significantly different expressed between all three subtypes. Based on this eleven genes we were able to design a regression model with an accuracy of 100 %. 
 
 
-> Discussion:
+# Discussion:
 
 We are aware that the number of chips we used is to little to get valid results. Although we could not find any clear differences between the radiation-exposed and not-exposed samples, an examination with more than the 30 chips, could come to another conclusion. 
 Furthermore, we looked into the known variants of PTC and found out that there are three, that occur the most: 
@@ -479,10 +467,12 @@ the conventional variant, the follicular variant and the tall cell variant (LLyo
 Additionally, the accuracy of the regression model seemed to high at first. But regarding the criteria for selecting the eleven genes the model is based on, it seems logical to get an accuracy of 100 %: All of our genes show a unique expression level in each subtype, so the model prediction has to be unambiguously.
 
 During our work on this report we discovered that certain analyses are based on coincidence, which prevented us from recreating the same results. After looking into it, we found out that the expression values of our TRAs as well as the kmeans clustering results differed a little bit after every run of our code. We think that the change in the expression values is due to the normalization process, because it is a method based on coincidence, as well as the kmeans clustering method. This is why we decided to load those two variables into the RMarkdown, to present the results we found during our project. We are aware that this limits the validity of our results.
+\newpage
 
-> Literature: 
+# Literature: 
 
 TRA datas:
+
 GTEX 2015, Human genomics (2015). The Genotype-Tissue Expression (GTEx) pilot analysis: multitissue gene regulation in humans. GTEx Consortium. Science 348(6235),648-60. 
 
 Lattin, J. E., Schroder, K., Su, A. I., Walker, J. R., Zhang, J., Wiltshire, T., Saijo, K., Glass, C. K., Hume, D. A., Kellie, S., Sweet, M. J. (2008). Expression analysis of G Protein-Coupled Receptors in mouse macrophages. Immunome Res. 29,4-5.
@@ -495,23 +485,37 @@ Su, A. I., Wiltshire, T., Batalov, S., Lap, H., Ching, K. A., Block, D., Zhang, 
 
 Uhlén, M., Fagerberg, L., Hallström, B.M., Lindskog, C., Oksvold, P., Mardinogl, A., Sivertsson, A., Kampf, C., Sjöstedt, E., Asplund, A., Olsson, I.M., Edlund, K., Lundberg, E., Navani, S., Szigyart, C.A.K., Odeberg, J., Djureinovic, D., Takanen, J.O., Hober, S., Alm, T., Edqvist, P.H., Berling, H., Tegel, H., Mulder, J., Rockberg, J., Nilsson, P., Schwenk, J.M., Hamsten, M., Feilitzen, K., Forsberg, M., Persson, L., Johansson, F., Zwahlen, M., Haijne, G., Nielsen, J. and Pontén, F. (2015). Proteomics. Tissue-based map of the human proteome. Science. 23;347(6220):1260419.
 
+Others: 
 
-in generell:
 Albi, E., Cataldi, S., Lazzarini, A., Codini, M., Beccari, T., Ambesi-Impiombato., F. S., Curcio, F (2017). Radaition and Thyroid Cancer. Int. J. Mol. Sci. 18(5), 911
 
 Dinkelacker, M. (2019). Chromosomal clustering of tissue restricted antigens, Dissertation, University Heidelberg, Germany.
 
 Dinkelacker, M. (2007). A database of genes that are expressed in a tissue-restricted manner to analyse promiscous gene expression in medullary thymic epithelial cells. Diplomarbeit, Albert-Ludwigs-Universitaet, Freiburg, Germany.
-Carina K (FS 4) — heute um 19:28 Uhr
 
 Kyewski, B. and Klein, L. (2006). A Central Role for Central Tolerance. Annu. Rev. Immunol. 24, 571-606.
 
 Lloyd, R. V., Buehler, D. and Khanfshar, E. (2011). Papillary Thyroid Carcinoma Variants. Head Neck Pathol. 5(1), 51-56.
+\newpage
+# Appendix
 
-## 6. Appendix
-```{r echo=FALSE, fig.cap="the 360 TRAs"}
+List of the 360 TRAs:
+```{r appendix1, echo=FALSE}
 list(rownames(thyroid.expr.matrix.sub))
 ```
+List of the 153 significantly different expressed genes between radiation-exposed, not-exposed and healthy samples:
+```{r appendix2, echo=FALSE}
+list(rownames(sig.genes.matrix))
+```
+List of the 134 significantly different expressed genes between at least two of the three cancer subtypes:
+```{r appendix3, echo=FALSE}
+list(rownames(cancer.subtype.sig.genes.matrix))
+```
+List of the eleven significantly different expressed genes between all three cancer subtypes:
+```{r appendix4, echo=FALSE}
+list(modelgenes.sub)
+```
+
 
 ```{r echo=FALSE, fig.cap="the 153 significantly different expressed genes between radiation-exposed, not-exposed and healthy samples"}
 list(rownames(sig.genes.matrix))
