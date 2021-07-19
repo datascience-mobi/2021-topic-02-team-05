@@ -91,6 +91,9 @@ We wanted to design a regression model to predict the cancer subtype through the
 
 
 
+For the evaluation of the multinominal regression model we created the tables above. The columnames of the table stand for the actual subtypes the chips belong to and the rownames stand for the subtype the chips are assigned to by the regression model. The first table belongs to the assignment of the 14 chips we trained our regression model with and the second one to the assignment of the six chips we tested our model with. All chips were assigned properl
+
+
 # Results:
 
 We identified 560 TRAs in the thyroid, but only 360 were represented on the microarray-type we used. Out of these 360 TRAs 153 were significantly different expressed between the three groups healthy, exposed and not-exposed to radiation. 
