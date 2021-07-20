@@ -834,7 +834,7 @@ dev.off()
 
   
 
-```{r heatmap, eval=FALSE, include=FALSE, fig.cap= "Heatmap of 20 of our genes of interest. This heatmap illustrates the gene expression of the first 20 thyroid specific antigens in our matrix."}
+```{r heatmap, eval=FALSE, include=FALSE, fig.cap= "Heatmap of  our genes of interest. This heatmap illustrates the gene expression of the thyroid specific antigens in our matrix."}
 
 library(pheatmap)
 
