@@ -1129,7 +1129,7 @@ subtype.matrix[,1]= relevel(factor(subtype.matrix[,1]), ref = "subtype 1")
 model.matrix.sub=subtype.matrix[,modelgenes.sub]
 model.matrix.sub= cbind(cancer.groups,model.matrix.sub)
 
-#Versuch Expressionswerte numerisch zu machen (bis jetzt ohne Erfolg)
+#Versuch Expressionswerte numerisch zu machen 
 model.matrix.sub=as.data.frame(model.matrix.sub)
 for (i in 2:12){
   model.matrix.sub[,i]=apply(model.matrix.sub[,i,drop=F],2,as.numeric)
